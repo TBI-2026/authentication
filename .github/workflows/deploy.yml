@@ -18,10 +18,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build Docker image
-        run: docker build -t kapsulkeaslian:latest .
+        run: docker build -t authentication:latest .
 
       - name: Save Docker image to file
-        run: docker save kapsulkeaslian:latest -o kapsulkeaslian.tar
+        run: docker save authentication:latest -o authentication.tar
 
       - name: Create .env file from secrets
         run: |
@@ -49,8 +49,8 @@ jobs:
 
       - name: Prepare deploy files
         run: |
-          mkdir kapsulkeaslian
-          mv kapsulkeaslian.tar .env docker-compose.yml kapsulkeaslian/
+          mkdir authentication
+          mv authentication.tar .env docker-compose.yml authentication/
 
       - name: Copy Docker image and .env to server
         uses: appleboy/scp-action@v0.1.4
@@ -58,7 +58,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
-          source: "kapsulkeaslian/*"
+          source: "authentication/*"
           target: "~/"
 
       - name: Deploy on remote server
@@ -68,12 +68,12 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            cd ~/kapsulkeaslian 
+            cd ~/authentication 
             
-            docker-compose down || true
-            docker rmi kapsulkeaslian:latest || true
+            docker compose down || true
+            docker rmi authentication:latest || true
             
-            docker load -i kapsulkeaslian.tar
-            rm kapsulkeaslian.tar
+            docker load -i authentication.tar
+            rm authentication.tar
             
-            docker-compose up -d
+            docker compose up -d

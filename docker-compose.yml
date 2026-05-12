@@ -1,10 +1,14 @@
 version: '3.8'
 
 services:
-  kapsulkeaslian:
-    image: kapsulkeaslian:latest
-    container_name: kapsulkeaslian
-    ports:
-      - "127.0.0.1:8080:8080"
+  authentication:
+    image: authentication:latest
+    container_name: authentication
     env_file:
       - .env
+    networks:
+      - internal-network
+
+networks:
+  internal-network:
+    external: true
